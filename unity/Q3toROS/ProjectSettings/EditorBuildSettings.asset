@@ -1,0 +1,14 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/PassthroughCamToROS.unity
+    guid: fc3cc080a6794fe42b868e8403afcc95
+  m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: f2bf97b3acdb64248a707c407c9fc54e, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: a971eac5e950046e586c5e153e32d05c, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 9d6cad077b11c47aa8de68032ce78bdd, type: 2}
