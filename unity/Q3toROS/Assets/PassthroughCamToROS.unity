@@ -2200,9 +2200,6 @@ MonoBehaviour:
   ImagePublisher: {fileID: 382521211}
   FrameId: quest3_right_eye
   PublishHz: 15
-  StartOnAwake: 1
-  UseOVRInputA: 1
-  ToggleKey: 112
 --- !u!114 &382521213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2216,7 +2213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CameraPosition: 1
-  RequestedResolution: {x: 0, y: 0}
+  RequestedResolution: {x: 1280, y: 960}
   TargetMaterial: {fileID: 0}
   _texturePropertyName: 
 --- !u!4 &382521215
@@ -6689,9 +6686,6 @@ MonoBehaviour:
   ImagePublisher: {fileID: 1155724898}
   FrameId: quest3_left_eye
   PublishHz: 15
-  StartOnAwake: 1
-  UseOVRInputA: 1
-  ToggleKey: 112
 --- !u!114 &1155724902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6705,7 +6699,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CameraPosition: 0
-  RequestedResolution: {x: 0, y: 0}
+  RequestedResolution: {x: 1280, y: 960}
   TargetMaterial: {fileID: 0}
   _texturePropertyName: 
 --- !u!1 &1158105412
@@ -10293,69 +10287,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1275195316}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1967244195
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 7047676844597515174, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7047676844597515174, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7047676844597515174, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7047676844597515174, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7047676844597515174, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7047676844597515174, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7047676844597515174, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7047676844597515174, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7047676844597515174, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7047676844597515174, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7847449403238870662, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_Name
-      value: WebCamTextureManagerPrefab
-      objectReference: {fileID: 0}
-    - target: {fileID: 7847449403238870662, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1748868316715821956, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-    - {fileID: 7412840042211121785, guid: abfaad578d05e4a09838223134c41c46, type: 3}
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: abfaad578d05e4a09838223134c41c46, type: 3}
 --- !u!1 &1967654333
 GameObject:
   m_ObjectHideFlags: 0
@@ -11420,7 +11351,6 @@ SceneRoots:
   - {fileID: 1110034867}
   - {fileID: 2094881455}
   - {fileID: 102553235}
-  - {fileID: 1967244195}
   - {fileID: 1155724899}
   - {fileID: 382521215}
   - {fileID: 1055886430}

@@ -1497,29 +1497,29 @@ MonoBehaviour:
   m_Name: Android
   m_EditorClassIdentifier: Unity.XR.OpenXR::UnityEngine.XR.OpenXR.OpenXRSettings
   features:
-  - {fileID: 1482942324460744646}
-  - {fileID: 2617400007033398932}
-  - {fileID: -7048852274434106420}
-  - {fileID: 8356285166359113177}
-  - {fileID: 3370565597955957314}
-  - {fileID: -4083555664354544833}
-  - {fileID: 3794175551431503664}
-  - {fileID: -7874618901227406437}
-  - {fileID: -8136814032530516191}
-  - {fileID: 2582738960706801329}
-  - {fileID: -8494409777315442936}
-  - {fileID: 2450617082371545126}
-  - {fileID: 7965268484226630252}
-  - {fileID: 798863162818414433}
-  - {fileID: 3388290708902726011}
-  - {fileID: 6635126878705251368}
-  - {fileID: -8527336194109987503}
-  - {fileID: 4530686605858784212}
-  - {fileID: -1662557949564267847}
-  - {fileID: -6687368123679709035}
-  - {fileID: 279590791708127157}
-  - {fileID: -2197088030787304998}
-  - {fileID: 7784170752852712525}
+  - {fileID: 4863154015730290321}
+  - {fileID: 5487818555389058857}
+  - {fileID: 5014638912294784695}
+  - {fileID: -8976817675654702187}
+  - {fileID: -1057071910501437156}
+  - {fileID: -5092041738680776017}
+  - {fileID: 8183037363345529260}
+  - {fileID: -324155101409089502}
+  - {fileID: 1649366854732208194}
+  - {fileID: -3809901516136570634}
+  - {fileID: -6917725303826717212}
+  - {fileID: 3422466821345790481}
+  - {fileID: -3988761629411100059}
+  - {fileID: 4480198399727150300}
+  - {fileID: 6255234789668757701}
+  - {fileID: 4035431991209111757}
+  - {fileID: -7139589304649927068}
+  - {fileID: -5096245336179522903}
+  - {fileID: 779852656646315561}
+  - {fileID: -4497577920641461418}
+  - {fileID: 3650179599571352374}
+  - {fileID: -6939095386338035477}
+  - {fileID: -4022280765287846376}
   customLoaderName: 
   m_renderMode: 1
   m_latencyOptimization: 0
@@ -1693,7 +1693,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4710975c7840e7d499bbb3757c22b0a5, type: 3}
   m_Name: MetaXRSubsampledLayout Android
   m_EditorClassIdentifier: Oculus.VR::Meta.XR.MetaXRSubsampledLayout
-  m_enabled: 0
+  m_enabled: 1
   nameUi: Meta XR Subsampled Layout
   version: 0.0.1
   featureIdInternal: com.meta.openxr.feature.subsampledLayout
