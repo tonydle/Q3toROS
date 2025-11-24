@@ -1,10 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-
 using Meta.XR.Samples;
-using Unity.Sentis;
+using Unity.InferenceEngine;
 using UnityEditor;
 using UnityEngine;
-using FF = Unity.Sentis.Functional;
 
 namespace PassthroughCameraSamples.MultiObjectDetection.Editor
 {
@@ -51,18 +49,18 @@ namespace PassthroughCameraSamples.MultiObjectDetection.Editor
                         -0.5f,  0,      0.5f,   0,
                         0,      -0.5f,  0,      0.5f
             };
-            var centersToCorners = FF.Constant(new TensorShape(4, 4), centersToCornersData);
-            var modelOutput = FF.Forward(model, input)[0];  //shape(1,N,85)
+            var centersToCorners = Functional.Constant(new TensorShape(4, 4), centersToCornersData);
+            var modelOutput = Functional.Forward(model, input)[0];  //shape(1,N,85)
             // Following for yolo model. in (1, 84, N) out put shape
             var boxCoords = modelOutput[0, ..4, ..].Transpose(0, 1);
             var allScores = modelOutput[0, 4.., ..].Transpose(0, 1);
-            var scores = FF.ReduceMax(allScores, 1);    //shape=(N)
-            var classIDs = FF.ArgMax(allScores, 1); //shape=(N)
-            var boxCorners = FF.MatMul(boxCoords, centersToCorners);    //shape=(N,4)
-            var indices = FF.NMS(boxCorners, scores, m_iouThreshold, m_scoreThreshold); //shape=(N)
-            var indices2 = indices.Unsqueeze(-1).BroadcastTo(new[] { 4 });  //shape=(N,4)
-            var labelIDs = FF.Gather(classIDs, 0, indices); //shape=(N)
-            var coords = FF.Gather(boxCoords, 0, indices2); //shape=(N,4)
+            var scores = Functional.ReduceMax(allScores, 1);                                    //shape=(N)
+            var classIDs = Functional.ArgMax(allScores, 1);                                     //shape=(N)
+            var boxCorners = Functional.MatMul(boxCoords, centersToCorners);                    //shape=(N,4)
+            var indices = Functional.NMS(boxCorners, scores, m_iouThreshold, m_scoreThreshold); //shape=(N)
+            var indices2 = indices.Unsqueeze(-1).BroadcastTo(new[] { 4 });                      //shape=(N,4)
+            var labelIDs = classIDs.Gather(0, indices);                                         //shape=(N)
+            var coords = boxCoords.Gather(0, indices2);                                         //shape=(N,4)
 
             var modelFinal = graph.Compile(coords, labelIDs);
 

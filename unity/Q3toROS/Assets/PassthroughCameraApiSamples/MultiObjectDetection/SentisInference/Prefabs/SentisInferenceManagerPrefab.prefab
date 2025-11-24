@@ -126,8 +126,8 @@ MonoBehaviour:
   m_labelsAsset: {fileID: 4900000, guid: c01c64149c7930b45a76559caabd5c78, type: 3}
   m_uiInference: {fileID: 2184060436030677583}
   OnnxModel: {fileID: 5022602860645237092, guid: e61826a46beb24bb380fd628c56eacaa, type: 3}
-  m_iouThreshold: 0.57
-  m_scoreThreshold: 0.37
+  m_iouThreshold: 0.56
+  m_scoreThreshold: 0.36
 --- !u!114 &2184060436030677583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,7 +141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_environmentRaycast: {fileID: 0}
-  m_webCamTextureManager: {fileID: 0}
+  m_cameraAccess: {fileID: 0}
   m_detectionCanvas: {fileID: 4976470222712890361}
   m_displayImage: {fileID: 144095598799144303}
   m_boxTexture: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8c536e29614c424c829f1696492a0a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_webCamTextureManager: {fileID: 0}
+  m_cameraAccess: {fileID: 0}
   m_detectionCanvas: {fileID: 7376517437398570920}
   m_canvasDistance: 0.92
 --- !u!1 &7376517437398570920

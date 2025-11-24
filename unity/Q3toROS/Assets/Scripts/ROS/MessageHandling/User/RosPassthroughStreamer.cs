@@ -1,16 +1,16 @@
 using UnityEngine;
-using PassthroughCameraSamples; // only for your Webcam manager type; remove if not needed
+using Meta.XR; 
 
 namespace Unity.Robotics
 {
     /// <summary>
-    /// Toggleable passthrough/WebCam image streamer.
+    /// Toggleable passthrough image streamer using PassthroughCameraAccess.
     /// Press the chosen button/key to start/stop publishing sensor_msgs/CompressedImage.
     /// </summary>
     public class RosPassthroughStreamer : MonoBehaviour
     {
         [Header("Sources")]
-        public WebCamTextureManager WebcamManager;
+        public PassthroughCameraAccess CameraAccess;
         public RosPublisherCompressedImage ImagePublisher;
 
         [Header("ROS Header")]
@@ -34,8 +34,23 @@ namespace Unity.Robotics
         {
             if (ImagePublisher == null)
                 Debug.LogError("[RosPassthroughStreamer] ImagePublisher not set.");
-            if (WebcamManager == null)
-                Debug.LogError("[RosPassthroughStreamer] WebcamManager not set.");
+            if (CameraAccess == null)
+                Debug.LogError("[RosPassthroughStreamer] CameraAccess not set.");
+
+            if (!PassthroughCameraAccess.IsSupported)
+            {
+                Debug.LogWarning(
+                    "[RosPassthroughStreamer] PassthroughCameraAccess is not supported " +
+                    "on this device / OS version. Streaming will be disabled."
+                );
+            }
+        }
+
+        private void OnEnable()
+        {
+            // Make sure the camera component is active so it can request permission
+            if (CameraAccess != null && !CameraAccess.enabled)
+                CameraAccess.enabled = true;
         }
 
         private void Start()
@@ -55,19 +70,31 @@ namespace Unity.Robotics
                 TogglePublishing();
 
             // --- Publish loop ---
-            if (!_isPublishing || ImagePublisher == null || WebcamManager == null)
+            if (!_isPublishing || ImagePublisher == null || CameraAccess == null)
                 return;
 
-            var wct = WebcamManager.WebCamTexture;
-            if (wct == null || !wct.isPlaying || wct.width <= 16) // not yet ready/started
+            // Wait until camera is actually playing
+            // (permission granted + camera started)
+            if (!CameraAccess.IsPlaying)
                 return;
 
-            if (Time.time >= _nextPublishTime)
-            {
-                _nextPublishTime += 1f / Mathf.Max(1f, PublishHz);
-                // Use the publisher's fast WebCamTexture path
-                ImagePublisher.Publish(wct, FrameId);
-            }
+            // Rate limiting
+            if (Time.time < _nextPublishTime)
+                return;
+
+            _nextPublishTime += 1f / Mathf.Max(1f, PublishHz);
+
+            // Get GPU texture from passthrough camera
+            Texture tex = CameraAccess.GetTexture();
+            if (tex == null || CameraAccess.CurrentResolution.x <= 16)
+                return; // still not ready / invalid
+
+            // If RosPublisherCompressedImage.Publish takes Texture, this compiles as-is.
+            // If it currently takes WebCamTexture, change its signature to Texture.
+            ImagePublisher.Publish(tex, FrameId);
+
+            // If you extend your publisher to take timestamps later, you could do:
+            // ImagePublisher.Publish(tex, FrameId, CameraAccess.Timestamp);
         }
 
         public void TogglePublishing() => SetPublishing(!_isPublishing);

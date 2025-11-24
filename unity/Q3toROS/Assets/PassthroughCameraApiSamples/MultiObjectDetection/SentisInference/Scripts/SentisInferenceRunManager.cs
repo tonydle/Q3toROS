@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Meta Platforms, Inc. and affiliates.
-
 using System;
 using System.Collections;
+using Meta.XR;
 using Meta.XR.Samples;
-using Unity.Sentis;
+using Unity.InferenceEngine;
 using UnityEngine;
 
 namespace PassthroughCameraSamples.MultiObjectDetection
@@ -39,6 +39,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         private Tensor<float> m_pullOutput;
         private Tensor<int> m_pullLabelIDs;
         private bool m_isWaiting = false;
+        private Pose m_imageCameraPose;
 
         #region Unity Functions
         private IEnumerator Start()
@@ -67,22 +68,21 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         #endregion
 
         #region Public Functions
-        public void RunInference(Texture targetTexture)
+        public void RunInference(PassthroughCameraAccess cameraAccess)
         {
             // If the inference is not running prepare the input
             if (!m_started)
             {
+                m_imageCameraPose = cameraAccess.GetCameraPose();
                 // clean last input
                 m_input?.Dispose();
-                // check if we have a texture from the camera
-                if (!targetTexture)
-                {
-                    return;
-                }
                 // Update Capture data
+                Texture targetTexture = cameraAccess.GetTexture();
                 m_uiInference.SetDetectionCapture(targetTexture);
                 // Convert the texture to a Tensor and schedule the inference
-                m_input = TextureConverter.ToTensor(targetTexture, m_inputSize.x, m_inputSize.y, 3);
+                var textureTransform = new TextureTransform().SetDimensions(targetTexture.width, targetTexture.height, 3);
+                m_input = new Tensor<float>(new TensorShape(1, 3, m_inputSize.x, m_inputSize.y));
+                TextureConverter.ToTensor(targetTexture, m_input, textureTransform);
                 m_schedule = m_engine.ScheduleIterable(m_input);
                 m_download_state = 0;
                 m_started = true;
@@ -103,9 +103,12 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             Debug.Log($"Sentis model loaded correctly with iouThreshold: {m_iouThreshold} and scoreThreshold: {m_scoreThreshold}");
             //Create engine to run model
             m_engine = new Worker(model, m_backend);
-            //Run a inference with an empty input to load the model in the memory and not pause the main thread.
-            var input = TextureConverter.ToTensor(new Texture2D(m_inputSize.x, m_inputSize.y), m_inputSize.x, m_inputSize.y, 3);
-            m_engine.Schedule(input);
+            //Run a inference with a empty image to load the model in the memory and not pause the main thread.
+            Texture m_loadingTexture = new Texture2D(m_inputSize.x, m_inputSize.y, TextureFormat.RGBA32, false);
+            var textureTransform = new TextureTransform().SetDimensions(m_loadingTexture.width, m_loadingTexture.height, 3);
+            m_input = new Tensor<float>(new TensorShape(1, 3, m_inputSize.x, m_inputSize.y));
+            TextureConverter.ToTensor(m_loadingTexture, m_input, textureTransform);
+            m_engine.Schedule(m_input);
             IsModelLoaded = true;
         }
 
@@ -195,7 +198,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                             }
                             else
                             {
-                                Debug.LogError("Sentis: m_output empty");
+                                Debug.Log("Sentis: m_output empty");
                                 m_download_state = 4;
                             }
                         }
@@ -227,7 +230,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                     }
                     break;
                 case 3:
-                    m_uiInference.DrawUIBoxes(m_output, m_labelIDs, m_inputSize.x, m_inputSize.y);
+                    m_uiInference.DrawUIBoxes(m_output, m_labelIDs, m_inputSize.x, m_inputSize.y, m_imageCameraPose);
                     m_download_state = 5;
                     break;
                 case 4:

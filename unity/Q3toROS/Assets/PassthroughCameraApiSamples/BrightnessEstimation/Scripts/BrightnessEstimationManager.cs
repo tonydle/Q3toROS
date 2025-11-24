@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using System.Collections.Generic;
+using Meta.XR;
 using Meta.XR.Samples;
 using UnityEngine;
 using UnityEngine.Events;
@@ -10,7 +11,7 @@ namespace PassthroughCameraSamples.BrightnessEstimation
     [MetaCodeSample("PassthroughCameraApiSamples-BrightnessEstimation")]
     public class BrightnessEstimationManager : MonoBehaviour
     {
-        [SerializeField] private WebCamTextureManager m_webCamTextureManager;
+        [SerializeField] private PassthroughCameraAccess m_cameraAccess;
         [SerializeField] private float m_refreshTime = 0.05f;
         [SerializeField][Range(1, 100)] private int m_bufferSize = 10;
         [SerializeField] private UnityEvent<float> m_onBrightnessChange;
@@ -18,24 +19,20 @@ namespace PassthroughCameraSamples.BrightnessEstimation
 
         private float m_refreshCurrentTime = 0.0f;
         private List<float> m_brightnessVals = new();
-        private Color32[] m_pixelsBuffer;
 
         private void Update()
         {
-            var webCamTexture = m_webCamTextureManager.WebCamTexture;
-            if (webCamTexture != null)
+            if (m_cameraAccess.IsPlaying)
             {
-                // Get the WebCamTexture CPU image
-                // Process WebCamTexture data
                 if (!IsWaiting())
                 {
-                    m_debugger.text = GetRoomAmbientLight(webCamTexture);
+                    m_debugger.text = GetRoomAmbientLight();
                     m_onBrightnessChange?.Invoke(GetGlobalBrigthnessLevel());
                 }
             }
             else
             {
-                m_debugger.text = PassthroughCameraPermissions.HasCameraPermission == true ? "Permission granted." : "No permission granted.";
+                m_debugger.text = OVRPermissionsRequester.IsPermissionGranted(OVRPermissionsRequester.Permission.PassthroughCameraAccess) ? "Permission granted." : "No permission granted.";
             }
         }
 
@@ -43,25 +40,18 @@ namespace PassthroughCameraSamples.BrightnessEstimation
         /// Estimate the Brightness Level using a Texture2D
         /// </summary>
         /// <returns>String data for debugging purposes</returns>
-        private string GetRoomAmbientLight(WebCamTexture webCamTexture)
+        private string GetRoomAmbientLight()
         {
-            if (!webCamTexture.isPlaying)
-            {
-                return "WebCamTexture is not playing.";
-            }
             m_refreshCurrentTime = m_refreshTime;
-            var w = webCamTexture.width;
-            var h = webCamTexture.height;
-
-            m_pixelsBuffer ??= new Color32[w * h];
-            _ = webCamTexture.GetPixels32(m_pixelsBuffer);
+            var pixels = m_cameraAccess.GetColors();
 
             float colorSum = 0;
-            for (int x = 0, len = m_pixelsBuffer.Length; x < len; x++)
+            for (int x = 0, len = pixels.Length; x < len; x++)
             {
-                colorSum += 0.2126f * m_pixelsBuffer[x].r + 0.7152f * m_pixelsBuffer[x].g + 0.0722f * m_pixelsBuffer[x].b;
+                colorSum += 0.2126f * pixels[x].r + 0.7152f * pixels[x].g + 0.0722f * pixels[x].b;
             }
-            var brightnessVals = Mathf.Floor(colorSum / (w * h));
+            var size = m_cameraAccess.CurrentResolution;
+            var brightnessVals = Mathf.Floor(colorSum / (size.x * size.y));
 
             m_brightnessVals.Add(brightnessVals);
 
@@ -70,7 +60,7 @@ namespace PassthroughCameraSamples.BrightnessEstimation
                 m_brightnessVals.RemoveAt(0);
             }
 
-            return $"Current brigthnessLevel: {brightnessVals}\nGlobal value: {GetGlobalBrigthnessLevel()}";
+            return $"Current brightness level: {brightnessVals}\nGlobal value: {GetGlobalBrigthnessLevel()}";
         }
 
         /// <summary>

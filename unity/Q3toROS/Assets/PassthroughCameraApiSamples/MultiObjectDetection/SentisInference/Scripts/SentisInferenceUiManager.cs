@@ -1,8 +1,9 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using System.Collections.Generic;
+using Meta.XR;
 using Meta.XR.Samples;
-using Unity.Sentis;
+using Unity.InferenceEngine;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -14,8 +15,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
     {
         [Header("Placement configureation")]
         [SerializeField] private EnvironmentRayCastSampleManager m_environmentRaycast;
-        [SerializeField] private WebCamTextureManager m_webCamTextureManager;
-        private PassthroughCameraEye CameraEye => m_webCamTextureManager.Eye;
+        [SerializeField] private PassthroughCameraAccess m_cameraAccess;
 
         [Header("UI display references")]
         [SerializeField] private SentisObjectDetectedUiManager m_detectionCanvas;
@@ -77,7 +77,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             m_detectionCanvas.CapturePosition();
         }
 
-        public void DrawUIBoxes(Tensor<float> output, Tensor<int> labelIDs, float imageWidth, float imageHeight)
+        public void DrawUIBoxes(Tensor<float> output, Tensor<int> labelIDs, float imageWidth, float imageHeight, Pose cameraPose)
         {
             // Updte canvas position
             m_detectionCanvas.UpdatePosition();
@@ -85,14 +85,8 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             // Clear current boxes
             ClearAnnotations();
 
-            var displayWidth = m_displayImage.rectTransform.rect.width;
+            float displayWidth = m_displayImage.rectTransform.rect.width;
             var displayHeight = m_displayImage.rectTransform.rect.height;
-
-            var scaleX = displayWidth / imageWidth;
-            var scaleY = displayHeight / imageHeight;
-
-            var halfWidth = displayWidth / 2;
-            var halfHeight = displayHeight / 2;
 
             var boxesFound = output.shape[0];
             if (boxesFound <= 0)
@@ -104,26 +98,21 @@ namespace PassthroughCameraSamples.MultiObjectDetection
 
             OnObjectsDetected?.Invoke(maxBoxes);
 
-            //Get the camera intrinsics
-            var intrinsics = PassthroughCameraUtils.GetCameraIntrinsics(CameraEye);
-            var camRes = intrinsics.Resolution;
-
             //Draw the bounding boxes
             for (var n = 0; n < maxBoxes; n++)
             {
                 // Get bounding box center coordinates
-                var centerX = output[n, 0] * scaleX - halfWidth;
-                var centerY = output[n, 1] * scaleY - halfHeight;
-                var perX = (centerX + halfWidth) / displayWidth;
-                var perY = (centerY + halfHeight) / displayHeight;
+                var normalizedCenterX = output[n, 0] / imageWidth;
+                var normalizedCenterY = output[n, 1] / imageHeight;
+                var centerX = displayWidth * (normalizedCenterX - 0.5f);
+                var centerY = displayHeight * (normalizedCenterY - 0.5f);
 
                 // Get object class name
                 var classname = m_labels[labelIDs[n]].Replace(" ", "_");
 
                 // Get the 3D marker world position using Depth Raycast
-                var centerPixel = new Vector2Int(Mathf.RoundToInt(perX * camRes.x), Mathf.RoundToInt((1.0f - perY) * camRes.y));
-                var ray = PassthroughCameraUtils.ScreenPointToRayInWorld(CameraEye, centerPixel);
-                var worldPos = m_environmentRaycast.PlaceGameObjectByScreenPos(ray);
+                var ray = m_cameraAccess.ViewportPointToRay(new Vector2(normalizedCenterX, 1.0f - normalizedCenterY), cameraPose);
+                var worldPos = m_environmentRaycast.Raycast(ray);
 
                 // Create a new bounding box
                 var box = new BoundingBox
@@ -131,9 +120,9 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                     CenterX = centerX,
                     CenterY = centerY,
                     ClassName = classname,
-                    Width = output[n, 2] * scaleX,
-                    Height = output[n, 3] * scaleY,
-                    Label = $"Id: {n} Class: {classname} Center (px): {(int)centerX},{(int)centerY} Center (%): {perX:0.00},{perY:0.00}",
+                    Width = output[n, 2] * (displayWidth / imageWidth),
+                    Height = output[n, 3] * (displayHeight / imageHeight),
+                    Label = $"Id: {n} Class: {classname} Center (px): {(int)centerX},{(int)centerY} Center (%): {normalizedCenterX:0.00},{normalizedCenterY:0.00}",
                     WorldPos = worldPos,
                 };
 

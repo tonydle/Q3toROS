@@ -1,7 +1,9 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Meta.XR;
 using Meta.XR.Samples;
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,7 +13,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
     [MetaCodeSample("PassthroughCameraApiSamples-MultiObjectDetection")]
     public class DetectionManager : MonoBehaviour
     {
-        [SerializeField] private WebCamTextureManager m_webCamTextureManager;
+        [SerializeField] private PassthroughCameraAccess m_cameraAccess;
 
         [Header("Controls configuration")]
         [SerializeField] private OVRInput.RawButton m_actionButton = OVRInput.RawButton.A;
@@ -40,6 +42,8 @@ namespace PassthroughCameraSamples.MultiObjectDetection
         #region Unity Functions
         private void Awake() => OVRManager.display.RecenteredPose += CleanMarkersCallBack;
 
+        private void OnDestroy() => OVRManager.display.RecenteredPose -= CleanMarkersCallBack;
+
         private IEnumerator Start()
         {
             // Wait until Sentis model is loaded
@@ -53,15 +57,11 @@ namespace PassthroughCameraSamples.MultiObjectDetection
 
         private void Update()
         {
-            // Get the WebCamTexture CPU image
-            var hasWebCamTextureData = m_webCamTextureManager.WebCamTexture != null;
-
             if (!m_isStarted)
             {
                 // Manage the Initial Ui Menu
-                if (hasWebCamTextureData && m_isSentisReady)
+                if (m_cameraAccess.IsPlaying && m_isSentisReady)
                 {
-                    m_uiMenuManager.OnInitialMenu(m_environmentRaycast.HasScenePermission());
                     m_isStarted = true;
                 }
             }
@@ -80,8 +80,8 @@ namespace PassthroughCameraSamples.MultiObjectDetection
                 }
             }
 
-            // Not start a sentis inference if the app is paused or we don't have a valid WebCamTexture
-            if (m_isPaused || !hasWebCamTextureData)
+            // Don't start Sentis inference if the app is paused or we don't have a camera image yet
+            if (m_isPaused || !m_cameraAccess.IsPlaying)
             {
                 if (m_isPaused)
                 {
@@ -94,7 +94,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
             // Run a new inference when the current inference finishes
             if (!m_runInference.IsRunning())
             {
-                m_runInference.RunInference(m_webCamTextureManager.WebCamTexture);
+                m_runInference.RunInference(m_cameraAccess);
             }
         }
         #endregion

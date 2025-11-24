@@ -33,7 +33,7 @@ namespace PassthroughCameraSamples.MultiObjectDetection
 #endif
         }
 
-        public Vector3? PlaceGameObjectByScreenPos(Ray ray)
+        public Vector3? Raycast(Ray ray)
         {
             if (EnvironmentRaycastManager.IsSupported)
             {

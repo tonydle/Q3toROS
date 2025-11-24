@@ -1,6 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 
 using System.Collections;
+using Meta.XR;
 using Meta.XR.Samples;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,53 +11,61 @@ namespace PassthroughCameraSamples.CameraToWorld
     [MetaCodeSample("PassthroughCameraApiSamples-CameraToWorld")]
     public class CameraToWorldCameraCanvas : MonoBehaviour
     {
-        [SerializeField] private WebCamTextureManager m_webCamTextureManager;
+        [SerializeField] private PassthroughCameraAccess m_cameraAccess;
         [SerializeField] private Text m_debugText;
         [SerializeField] private RawImage m_image;
         private Texture2D m_cameraSnapshot;
-        private Color32[] m_pixelsBuffer;
 
         public void MakeCameraSnapshot()
         {
-            var webCamTexture = m_webCamTextureManager.WebCamTexture;
-            if (webCamTexture == null || !webCamTexture.isPlaying)
+            if (!m_cameraAccess.IsPlaying)
+            {
+                Debug.LogError("!m_cameraAccess.IsPlaying");
                 return;
+            }
 
             if (m_cameraSnapshot == null)
             {
-                m_cameraSnapshot = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32, false);
+                var size = m_cameraAccess.CurrentResolution;
+                m_cameraSnapshot = new Texture2D(size.x, size.y, TextureFormat.RGBA32, false);
             }
 
-            // Copy the last available image from WebCamTexture to a separate object
-            m_pixelsBuffer ??= new Color32[webCamTexture.width * webCamTexture.height];
-            _ = m_webCamTextureManager.WebCamTexture.GetPixels32(m_pixelsBuffer);
-            m_cameraSnapshot.SetPixels32(m_pixelsBuffer);
+            var pixels = m_cameraAccess.GetColors();
+            m_cameraSnapshot.LoadRawTextureData(pixels);
             m_cameraSnapshot.Apply();
 
+            StopCoroutine(ResumeStreamingFromCameraCor());
             m_image.texture = m_cameraSnapshot;
         }
 
         public void ResumeStreamingFromCamera()
         {
-            m_image.texture = m_webCamTextureManager.WebCamTexture;
+            StartCoroutine(ResumeStreamingFromCameraCor());
+        }
+
+        private IEnumerator ResumeStreamingFromCameraCor()
+        {
+            while (!m_cameraAccess.IsPlaying)
+            {
+                yield return null;
+            }
+            m_image.texture = m_cameraAccess.GetTexture();
         }
 
         private IEnumerator Start()
         {
-            while (m_webCamTextureManager.WebCamTexture == null)
+            m_debugText.text = "No permission granted.";
+            while (!OVRPermissionsRequester.IsPermissionGranted(OVRPermissionsRequester.Permission.PassthroughCameraAccess))
             {
                 yield return null;
             }
-            m_debugText.text = "WebCamTexture Object ready and playing.";
-            ResumeStreamingFromCamera();
-        }
+            m_debugText.text = "Permission granted.";
 
-        private void Update()
-        {
-            if (PassthroughCameraPermissions.HasCameraPermission != true)
+            while (!m_cameraAccess.IsPlaying)
             {
-                m_debugText.text = "No permission granted.";
+                yield return null;
             }
+            ResumeStreamingFromCamera();
         }
     }
 }

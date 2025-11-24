@@ -1144,7 +1144,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Unity Sentis version: 2.1.1\nAI model: Yolo \nDetecting objects: 0\nObject
+  m_Text: "Unity Sentis version: 2.1.3\nAI model: Yolo \nDetecting objects: 0\nObject
     identified: 0"
 --- !u!1 &5069367858732599368
 GameObject:
@@ -1801,7 +1801,7 @@ MonoBehaviour:
   m_loadingPanel: {fileID: 538354901286188544}
   m_initialPanel: {fileID: 4304867643667793}
   m_noPermissionPanel: {fileID: 225161860600929460}
-  m_labelInfromation: {fileID: 5035866059478431671}
+  m_labelInformation: {fileID: 5035866059478431671}
   m_buttonSound: {fileID: 6850496571433932089}
   OnPause:
     m_PersistentCalls:
