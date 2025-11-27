@@ -1716,7 +1716,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &322511894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2224,10 +2224,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb4448d5a4a10d428cfe5d1fb454e42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _topic: /quest3/right_eye/compressed
+  _topic: /quest3/right_eye/color/compressed
   m_frameID: quest3_right_eye
   m_format: jpeg
-  m_jpegQuality: 80
+  m_jpegQuality: 50
   m_flipVertical: 0
   m_publishTestTexture: 0
   m_testTexture: {fileID: 2800000, guid: fff70cc323e7244f0a6fed5ecb11a9a1, type: 3}
@@ -6133,7 +6133,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4636273211292782587, guid: 534c07cb15f0817498751dafd4e106e9, type: 3}
       propertyPath: m_RosIPAddress
-      value: 150.22.0.100
+      value: 192.168.0.100
       objectReference: {fileID: 0}
     - target: {fileID: 4636273211292782587, guid: 534c07cb15f0817498751dafd4e106e9, type: 3}
       propertyPath: listenForTFMessages
@@ -6743,10 +6743,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb4448d5a4a10d428cfe5d1fb454e42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _topic: /quest3/left_eye/compressed
+  _topic: /quest3/left_eye/color/compressed
   m_frameID: quest3_left_eye
   m_format: jpeg
-  m_jpegQuality: 80
+  m_jpegQuality: 50
   m_flipVertical: 0
   m_publishTestTexture: 0
   m_testTexture: {fileID: 2800000, guid: fff70cc323e7244f0a6fed5ecb11a9a1, type: 3}
@@ -8522,7 +8522,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1480135700
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -8995,6 +8995,79 @@ Transform:
   - {fileID: 1105011578}
   m_Father: {fileID: 1787806034}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1589689749
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1589689752}
+  - component: {fileID: 1589689751}
+  - component: {fileID: 1589689750}
+  m_Layer: 0
+  m_Name: Environment Depth Right Eye to ROS
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1589689750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1589689749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb4448d5a4a10d428cfe5d1fb454e42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _topic: /quest3/right_eye/depth/compressed
+  m_frameID: quest3_right_eye
+  m_format: jpeg
+  m_jpegQuality: 80
+  m_flipVertical: 0
+  m_publishTestTexture: 0
+  m_testTexture: {fileID: 2800000, guid: fff70cc323e7244f0a6fed5ecb11a9a1, type: 3}
+  m_testFrameId: camera
+  m_publishHz: 10
+  m_reencodeEveryFrame: 0
+--- !u!114 &1589689751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1589689749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5935d5d7436fabc4d9179367745def01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Unity.Robotics.RosEnvironmentDepthCompressedStreamer
+  DepthManager: {fileID: 443490232}
+  ImagePublisher: {fileID: 1589689750}
+  FrameId: quest3_right_eye
+  EyeSlice: 1
+  DepthTextureProperty: _EnvironmentDepthTexture
+  PublishHz: 15
+--- !u!4 &1589689752
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1589689749}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.08129, y: 0, z: 1.41718}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1589953159
 GameObject:
   m_ObjectHideFlags: 0
@@ -9365,6 +9438,79 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1824407318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1661517012
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1661517014}
+  - component: {fileID: 1661517013}
+  - component: {fileID: 1661517015}
+  m_Layer: 0
+  m_Name: Environment Depth Left Eye to ROS
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1661517013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1661517012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5935d5d7436fabc4d9179367745def01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Unity.Robotics.RosEnvironmentDepthCompressedStreamer
+  DepthManager: {fileID: 443490232}
+  ImagePublisher: {fileID: 1661517015}
+  FrameId: quest3_left_eye
+  EyeSlice: 0
+  DepthTextureProperty: _EnvironmentDepthTexture
+  PublishHz: 15
+--- !u!4 &1661517014
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1661517012}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.08129, y: 0, z: 1.41718}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1661517015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1661517012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb4448d5a4a10d428cfe5d1fb454e42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _topic: /quest3/left_eye/depth/compressed
+  m_frameID: quest3_left_eye
+  m_format: jpeg
+  m_jpegQuality: 80
+  m_flipVertical: 0
+  m_publishTestTexture: 0
+  m_testTexture: {fileID: 2800000, guid: fff70cc323e7244f0a6fed5ecb11a9a1, type: 3}
+  m_testFrameId: camera
+  m_publishHz: 10
+  m_reencodeEveryFrame: 0
 --- !u!1 &1661870274
 GameObject:
   m_ObjectHideFlags: 0
@@ -11563,7 +11709,9 @@ SceneRoots:
   - {fileID: 102553235}
   - {fileID: 1155724899}
   - {fileID: 382521215}
-  - {fileID: 1055886430}
   - {fileID: 443490233}
+  - {fileID: 1661517014}
+  - {fileID: 1589689752}
   - {fileID: 322511895}
   - {fileID: 1480135703}
+  - {fileID: 1055886430}

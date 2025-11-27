@@ -118,9 +118,7 @@ namespace Unity.Robotics
             m_cacheDirty = false;
         }
 
-        // ---------- PUBLIC PUBLISH APIS (unchanged) ----------
-
-        /// <summary>Publish a Texture2D directly (must be readable or we’ll copy it).</summary>
+        /// <summary>Publish a Texture2D directly (must be readable or we'll copy it).</summary>
         public void Publish(Texture2D tex, string frameIdOverride = null)
         {
             if (tex == null) return;
@@ -139,7 +137,7 @@ namespace Unity.Robotics
             Publish(_message);
         }
 
-        /// <summary>Publish any Texture (e.g., RenderTexture). Will be copied to a readable Texture2D.</summary>
+        /// <summary>Publish any Texture. Will be copied to a readable Texture2D.</summary>
         public void Publish(Texture tex, string frameIdOverride = null)
         {
             if (tex == null) return;
@@ -158,12 +156,12 @@ namespace Unity.Robotics
             Publish(_message);
         }
 
-        /// <summary>Convenience: publish from an active WebCamTexture.</summary>
+        /// <summary>Publish from an active WebCamTexture.</summary>
         public void Publish(WebCamTexture webcamTex, string frameIdOverride = null)
         {
             if (webcamTex == null || !webcamTex.isPlaying || webcamTex.width <= 16) return;
 
-            // Lazily (re)allocate scratch to match webcam size
+            // Re-allocate scratch to match webcam size
             if (m_scratchReadable == null || m_scratchReadable.width != webcamTex.width || m_scratchReadable.height != webcamTex.height)
                 m_scratchReadable = new Texture2D(webcamTex.width, webcamTex.height, TextureFormat.RGBA32, false);
 
@@ -204,6 +202,11 @@ namespace Unity.Robotics
         {
             int w = src.width, h = src.height;
 
+            // Detect if source is single-channel (like R16 depth RT)
+            bool isSingleChannel = false;
+            if (src is RenderTexture srcRT && srcRT.format == RenderTextureFormat.R16)
+                isSingleChannel = true;
+
             if (scratch == null || scratch.width != w || scratch.height != h || scratch.format != TextureFormat.RGBA32)
                 scratch = new Texture2D(w, h, TextureFormat.RGBA32, false);
 
@@ -216,17 +219,31 @@ namespace Unity.Robotics
                 RenderTexture.active = rt;
                 scratch.ReadPixels(new Rect(0, 0, w, h), 0, 0, false);
                 scratch.Apply(false, false);
+
+                // Grayscale fix for single-channel sources
+                if (isSingleChannel)
+                {
+                    var pixels = scratch.GetPixels32();
+                    for (int i = 0; i < pixels.Length; i++)
+                    {
+                        var c = pixels[i];
+                        byte v = c.r;
+                        pixels[i] = new Color32(v, v, v, 255);
+                    }
+
+                    scratch.SetPixels32(pixels);
+                    scratch.Apply(false, false);
+                }
             }
             finally
             {
                 RenderTexture.active = prev;
                 RenderTexture.ReleaseTemporary(rt);
             }
-
             return scratch;
         }
 
-        /// <summary>In-place vertical flip of Texture2D pixels (RGBA32 path).</summary>
+        /// <summary>Vertical flip of Texture2D pixels (RGBA32 path).</summary>
         private static void FlipInPlaceVertical(Texture2D tex)
         {
             var w = tex.width;
