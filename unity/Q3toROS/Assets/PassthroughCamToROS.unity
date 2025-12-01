@@ -2205,6 +2205,7 @@ GameObject:
   - component: {fileID: 382521213}
   - component: {fileID: 382521212}
   - component: {fileID: 382521211}
+  - component: {fileID: 382521216}
   m_Layer: 0
   m_Name: Passthrough Right Eye to ROS
   m_TagString: Untagged
@@ -2227,7 +2228,7 @@ MonoBehaviour:
   _topic: /quest3/right_eye/color/compressed
   m_frameID: quest3_right_eye
   m_format: jpeg
-  m_jpegQuality: 50
+  m_jpegQuality: 80
   m_flipVertical: 0
   m_publishTestTexture: 0
   m_testTexture: {fileID: 2800000, guid: fff70cc323e7244f0a6fed5ecb11a9a1, type: 3}
@@ -2246,10 +2247,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7f66d7e044bec047bb62b022cad4432, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraAccess: {fileID: 382521213}
-  ImagePublisher: {fileID: 382521211}
-  FrameId: quest3_right_eye
-  PublishHz: 15
+  cameraAccess: {fileID: 382521213}
+  imagePublisher: {fileID: 382521211}
+  cameraInfoPublisher: {fileID: 382521216}
+  frameId: quest3_right_eye
+  publishHz: 30
+  publishCameraInfo: 1
+  cameraInfoOnce: 0
 --- !u!114 &382521213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2281,6 +2285,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &382521216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382521210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 603af1c12f4c4f7582a71b4f483be6f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Unity.Robotics.RosPublisherCameraInfo
+  _topic: /quest3/right_eye/color/camera_info
+  mFrameID: quest3_right_eye
+  mDistortionModel: plumb_bob
 --- !u!1 &386307670
 GameObject:
   m_ObjectHideFlags: 0
@@ -6724,6 +6743,7 @@ GameObject:
   - component: {fileID: 1155724902}
   - component: {fileID: 1155724900}
   - component: {fileID: 1155724898}
+  - component: {fileID: 1155724903}
   m_Layer: 0
   m_Name: Passthrough Left Eye to ROS
   m_TagString: Untagged
@@ -6746,7 +6766,7 @@ MonoBehaviour:
   _topic: /quest3/left_eye/color/compressed
   m_frameID: quest3_left_eye
   m_format: jpeg
-  m_jpegQuality: 50
+  m_jpegQuality: 80
   m_flipVertical: 0
   m_publishTestTexture: 0
   m_testTexture: {fileID: 2800000, guid: fff70cc323e7244f0a6fed5ecb11a9a1, type: 3}
@@ -6780,10 +6800,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7f66d7e044bec047bb62b022cad4432, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraAccess: {fileID: 1155724902}
-  ImagePublisher: {fileID: 1155724898}
-  FrameId: quest3_left_eye
-  PublishHz: 15
+  cameraAccess: {fileID: 1155724902}
+  imagePublisher: {fileID: 1155724898}
+  cameraInfoPublisher: {fileID: 1155724903}
+  frameId: quest3_left_eye
+  publishHz: 30
+  publishCameraInfo: 1
+  cameraInfoOnce: 0
 --- !u!114 &1155724902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6800,6 +6823,21 @@ MonoBehaviour:
   RequestedResolution: {x: 1280, y: 960}
   TargetMaterial: {fileID: 0}
   _texturePropertyName: 
+--- !u!114 &1155724903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1155724897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 603af1c12f4c4f7582a71b4f483be6f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Unity.Robotics.RosPublisherCameraInfo
+  _topic: /quest3/left_eye/color/camera_info
+  mFrameID: quest3_left_eye
+  mDistortionModel: plumb_bob
 --- !u!1 &1158105412
 GameObject:
   m_ObjectHideFlags: 0

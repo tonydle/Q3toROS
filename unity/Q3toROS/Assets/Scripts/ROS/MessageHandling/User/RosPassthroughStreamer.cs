@@ -4,30 +4,40 @@ using Meta.XR;
 namespace Unity.Robotics
 {
     /// <summary>
-    /// Toggleable passthrough image streamer using PassthroughCameraAccess.
-    /// Press the chosen button/key to start/stop publishing sensor_msgs/CompressedImage.
+    /// Passthrough image streamer using PassthroughCameraAccess.
+    /// Publishes sensor_msgs/CompressedImage and optionally sensor_msgs/CameraInfo.
     /// </summary>
     public class RosPassthroughStreamer : MonoBehaviour
     {
         [Header("Sources")]
-        public PassthroughCameraAccess CameraAccess;
-        public RosPublisherCompressedImage ImagePublisher;
+        public PassthroughCameraAccess cameraAccess;
+        public RosPublisherCompressedImage imagePublisher;
+        public RosPublisherCameraInfo cameraInfoPublisher; 
 
         [Header("ROS Header")]
-        public string FrameId = "quest3_passthrough";
+        public string frameId = "quest3_passthrough";
 
         [Header("Streaming")]
         [Tooltip("Target publish rate (Hz).")]
-        [Range(1f, 120f)] public float PublishHz = 15f;
+        [Range(1f, 120f)] public float publishHz = 15f;
 
-        private float _nextPublishTime;
+        [Tooltip("If true, publish CameraInfo together with CompressedImage.")]
+        public bool publishCameraInfo = true;
+
+        [Tooltip("If true, send CameraInfo only once after camera starts.")]
+        public bool cameraInfoOnce = false;
+
+        private float m_nextPublishTime;
+        private bool m_cameraInfoSent;
 
         private void Awake()
         {
-            if (ImagePublisher == null)
+            if (!imagePublisher)
                 Debug.LogError("[RosPassthroughStreamer] ImagePublisher not set.");
-            if (CameraAccess == null)
+            if (!cameraAccess)
                 Debug.LogError("[RosPassthroughStreamer] CameraAccess not set.");
+            if (publishCameraInfo && !cameraInfoPublisher)
+                Debug.LogWarning("[RosPassthroughStreamer] CameraInfoPublisher not set.");
 
             if (!PassthroughCameraAccess.IsSupported)
             {
@@ -41,43 +51,86 @@ namespace Unity.Robotics
         private void OnEnable()
         {
             // Make sure the camera component is active so it can request permission
-            if (CameraAccess != null && !CameraAccess.enabled)
-                CameraAccess.enabled = true;
+            if (cameraAccess && !cameraAccess.enabled)
+                cameraAccess.enabled = true;
         }
 
         private void Start()
         {
-            _nextPublishTime = Time.time;
+            m_nextPublishTime = Time.time;
+            m_cameraInfoSent = false;
         }
 
         private void Update()
         {
-            // --- Publish loop ---
-            if (ImagePublisher == null || CameraAccess == null)
+            if (!imagePublisher || !cameraAccess)
                 return;
 
             // Wait until camera is actually playing
-            // (permission granted + camera started)
-            if (!CameraAccess.IsPlaying)
+            if (!cameraAccess.IsPlaying)
                 return;
 
             // Rate limiting
-            if (Time.time < _nextPublishTime)
+            if (Time.time < m_nextPublishTime)
                 return;
 
-            _nextPublishTime += 1f / Mathf.Max(1f, PublishHz);
+            m_nextPublishTime += 1f / Mathf.Max(1f, publishHz);
 
             // Get GPU texture from passthrough camera
-            Texture tex = CameraAccess.GetTexture();
-            if (tex == null || CameraAccess.CurrentResolution.x <= 16)
+            var tex = cameraAccess.GetTexture();
+            if (!tex || cameraAccess.CurrentResolution.x <= 16)
                 return; // still not ready / invalid
 
-            // If RosPublisherCompressedImage.Publish takes Texture, this compiles as-is.
-            // If it currently takes WebCamTexture, change its signature to Texture.
-            ImagePublisher.Publish(tex, FrameId);
+            // Publish image
+            imagePublisher.Publish(tex, frameId);
 
-            // If you extend your publisher to take timestamps later, you could do:
-            // ImagePublisher.Publish(tex, FrameId, CameraAccess.Timestamp);
+            // Publish CameraInfo (derived from PassthroughCameraAccess intrinsics)
+            if (publishCameraInfo && cameraInfoPublisher)
+            {
+                if (!cameraInfoOnce || !m_cameraInfoSent)
+                {
+                    PublishCameraInfoFromIntrinsics();
+                    m_cameraInfoSent = true;
+                }
+            }
+        }
+
+        // ReSharper disable Unity.PerformanceAnalysis
+        private void PublishCameraInfoFromIntrinsics()
+        {
+            // Resolution: prefer CurrentResolution; fallback to intrinsics sensor resolution
+            var res = cameraAccess.CurrentResolution;
+            var intr = cameraAccess.Intrinsics;
+
+            if (res.x <= 0 || res.y <= 0)
+                res = intr.SensorResolution;
+
+            if (res.x <= 0 || res.y <= 0)
+            {
+                Debug.LogWarning("[RosPassthroughStreamer] Invalid resolution for CameraInfo.");
+                return;
+            }
+
+            // Intrinsics: fx/fy, cx/cy from Meta's intrinsics
+            var focal = intr.FocalLength;      // Vector2 (fx, fy)
+            var pp    = intr.PrincipalPoint;   // Vector2 (cx, cy)
+
+            double fx = focal.x;
+            double fy = focal.y;
+            double cx = pp.x;
+            double cy = pp.y;
+
+            // Distortion unknown
+            cameraInfoPublisher.Publish(
+                res.x,
+                res.y,
+                fx,
+                fy,
+                cx,
+                cy,
+                frameId,
+                null  // or new double[5]{k1,k2,t1,t2,k3} if we have real values
+            );
         }
     }
 }

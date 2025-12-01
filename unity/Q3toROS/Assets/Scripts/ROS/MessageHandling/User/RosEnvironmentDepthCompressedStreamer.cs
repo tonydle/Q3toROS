@@ -58,17 +58,19 @@ namespace Unity.Robotics
             if (DepthManager != null)
                 DepthManager.enabled = false;
 
-            if (_eyeTexture != null)
+            if (_eyeTexture == null)
             {
-                _eyeTexture.Release();
-                Destroy(_eyeTexture);
-                _eyeTexture = null;
+                return;
             }
+
+            _eyeTexture.Release();
+            Destroy(_eyeTexture);
+            _eyeTexture = null;
         }
 
         private void LateUpdate()
         {
-            if (DepthManager == null || ImagePublisher == null)
+            if (!DepthManager || !ImagePublisher)
                 return;
 
             if (!DepthManager.IsDepthAvailable)
@@ -82,16 +84,16 @@ namespace Unity.Robotics
 
             // Grab the global depth texture (2D array: stereo)
             var globalTex = Shader.GetGlobalTexture(DepthTextureProperty) as RenderTexture;
-            if (globalTex == null)
+            if (!globalTex)
                 return;
 
-            int w = globalTex.width;
-            int h = globalTex.height;
+            var w = globalTex.width;
+            var h = globalTex.height;
 
             // Allocate per-eye 2D RT lazily
-            if (_eyeTexture == null || _eyeTexture.width != w || _eyeTexture.height != h)
+            if (!_eyeTexture || _eyeTexture.width != w || _eyeTexture.height != h)
             {
-                if (_eyeTexture != null)
+                if (_eyeTexture)
                 {
                     _eyeTexture.Release();
                     Destroy(_eyeTexture);
@@ -103,7 +105,7 @@ namespace Unity.Robotics
                 _eyeTexture.Create();
             }
 
-            int slice = Mathf.Clamp(EyeSlice, 0, 1);
+            var slice = Mathf.Clamp(EyeSlice, 0, 1);
 
             // Copy one slice (eye) from the 2D array to our 2D texture
             Graphics.CopyTexture(globalTex, slice, 0, _eyeTexture, 0, 0);

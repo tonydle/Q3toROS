@@ -121,7 +121,7 @@ namespace Unity.Robotics
         /// <summary>Publish a Texture2D directly (must be readable or we'll copy it).</summary>
         public void Publish(Texture2D tex, string frameIdOverride = null)
         {
-            if (tex == null) return;
+            if (!tex) return;
 
             var readable = EnsureReadable(tex, ref m_scratchReadable);
             if (m_flipVertical) FlipInPlaceVertical(readable);
@@ -186,7 +186,7 @@ namespace Unity.Robotics
             _message.header.frame_id = string.IsNullOrEmpty(frameIdOverride) ? m_frameID : frameIdOverride;
 
             var now = DateTime.UtcNow;
-            long epochMs = (long)(now - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+            var epochMs = (long)(now - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
             _message.header.stamp.sec = (int)(epochMs / 1000);
             _message.header.stamp.nanosec = (uint)((epochMs % 1000) * 1_000_000);
         }
@@ -203,11 +203,11 @@ namespace Unity.Robotics
             int w = src.width, h = src.height;
 
             // Detect if source is single-channel (like R16 depth RT)
-            bool isSingleChannel = false;
+            var isSingleChannel = false;
             if (src is RenderTexture srcRT && srcRT.format == RenderTextureFormat.R16)
                 isSingleChannel = true;
 
-            if (scratch == null || scratch.width != w || scratch.height != h || scratch.format != TextureFormat.RGBA32)
+            if (!scratch || scratch.width != w || scratch.height != h || scratch.format != TextureFormat.RGBA32)
                 scratch = new Texture2D(w, h, TextureFormat.RGBA32, false);
 
             var rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32);
@@ -227,7 +227,7 @@ namespace Unity.Robotics
                     for (int i = 0; i < pixels.Length; i++)
                     {
                         var c = pixels[i];
-                        byte v = c.r;
+                        var v = c.r;
                         pixels[i] = new Color32(v, v, v, 255);
                     }
 
@@ -252,13 +252,11 @@ namespace Unity.Robotics
 
             for (int yTop = 0, yBot = h - 1; yTop < yBot; yTop++, yBot--)
             {
-                int rowTop = yTop * w;
-                int rowBot = yBot * w;
-                for (int x = 0; x < w; x++)
+                var rowTop = yTop * w;
+                var rowBot = yBot * w;
+                for (var x = 0; x < w; x++)
                 {
-                    var tmp = pixels[rowTop + x];
-                    pixels[rowTop + x] = pixels[rowBot + x];
-                    pixels[rowBot + x] = tmp;
+                    (pixels[rowTop + x], pixels[rowBot + x]) = (pixels[rowBot + x], pixels[rowTop + x]);
                 }
             }
 
