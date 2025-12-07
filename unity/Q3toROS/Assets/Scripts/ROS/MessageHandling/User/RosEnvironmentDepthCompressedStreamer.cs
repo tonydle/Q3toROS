@@ -12,31 +12,37 @@ namespace Unity.Robotics
     public class RosEnvironmentDepthCompressedStreamer : MonoBehaviour
     {
         [Header("Sources")]
-        public EnvironmentDepthManager DepthManager;
-        public RosPublisherCompressedImage ImagePublisher;
+        public EnvironmentDepthManager depthManager;
+        public RosPublisherCompressedImage imagePublisher;
 
         [Header("ROS Header")]
-        public string FrameId = "quest3_depth";
-
+        public string frameId = "quest3_depth";
+        
         [Header("Depth texture")]
         [Tooltip("0 = left eye slice, 1 = right eye slice in the depth texture array.")]
-        [Range(0, 1)] public int EyeSlice = 0;
+        [Range(0, 1)] public int eyeSlice;
 
         [Tooltip("Global shader property name that EnvironmentDepthManager writes to.")]
-        public string DepthTextureProperty = "_EnvironmentDepthTexture";
-
+        public string depthTextureProperty = "_EnvironmentDepthTexture";
+        
         [Header("Streaming")]
         [Tooltip("Publish rate (Hz).")]
-        [Range(1f, 120f)] public float PublishHz = 15f;
+        [Range(1f, 120f)] public float publishHz = 15f;
+        
+        public string PublishHzString
+        {
+            get => publishHz.ToString();
+            set => publishHz = float.Parse(value);
+        }
 
-        private float _nextPublishTime;
-        private RenderTexture _eyeTexture;
+        private float m_nextPublishTime;
+        private RenderTexture m_eyeTexture;
 
         private void Awake()
         {
-            if (DepthManager == null)
+            if (depthManager == null)
                 Debug.LogError("[RosEnvironmentDepthCompressedStreamer] DepthManager not set.");
-            if (ImagePublisher == null)
+            if (imagePublisher == null)
                 Debug.LogError("[RosEnvironmentDepthCompressedStreamer] ImagePublisher not set.");
 
             if (!EnvironmentDepthManager.IsSupported)
@@ -47,43 +53,43 @@ namespace Unity.Robotics
 
         private void OnEnable()
         {
-            if (DepthManager != null)
-                DepthManager.enabled = true;
+            if (depthManager != null)
+                depthManager.enabled = true;
 
-            _nextPublishTime = Time.time;
+            m_nextPublishTime = Time.time;
         }
 
         private void OnDisable()
         {
-            if (DepthManager != null)
-                DepthManager.enabled = false;
+            if (depthManager != null)
+                depthManager.enabled = false;
 
-            if (_eyeTexture == null)
+            if (m_eyeTexture == null)
             {
                 return;
             }
 
-            _eyeTexture.Release();
-            Destroy(_eyeTexture);
-            _eyeTexture = null;
+            m_eyeTexture.Release();
+            Destroy(m_eyeTexture);
+            m_eyeTexture = null;
         }
 
         private void LateUpdate()
         {
-            if (!DepthManager || !ImagePublisher)
+            if (!depthManager || !imagePublisher)
                 return;
 
-            if (!DepthManager.IsDepthAvailable)
+            if (!depthManager.IsDepthAvailable)
                 return;
 
             // Rate limiting
-            if (Time.time < _nextPublishTime)
+            if (Time.time < m_nextPublishTime)
                 return;
 
-            _nextPublishTime += 1f / Mathf.Max(1f, PublishHz);
+            m_nextPublishTime += 1f / Mathf.Max(1f, publishHz);
 
             // Grab the global depth texture (2D array: stereo)
-            var globalTex = Shader.GetGlobalTexture(DepthTextureProperty) as RenderTexture;
+            var globalTex = Shader.GetGlobalTexture(depthTextureProperty) as RenderTexture;
             if (!globalTex)
                 return;
 
@@ -91,27 +97,27 @@ namespace Unity.Robotics
             var h = globalTex.height;
 
             // Allocate per-eye 2D RT lazily
-            if (!_eyeTexture || _eyeTexture.width != w || _eyeTexture.height != h)
+            if (!m_eyeTexture || m_eyeTexture.width != w || m_eyeTexture.height != h)
             {
-                if (_eyeTexture)
+                if (m_eyeTexture)
                 {
-                    _eyeTexture.Release();
-                    Destroy(_eyeTexture);
+                    m_eyeTexture.Release();
+                    Destroy(m_eyeTexture);
                 }
 
                 // Single-channel-ish; will be blitted to RGBA32 in the publisher anyway
                 // TODO: using R8 and updating the publisher to handle it
-                _eyeTexture = new RenderTexture(w, h, 0, RenderTextureFormat.R16);
-                _eyeTexture.Create();
+                m_eyeTexture = new RenderTexture(w, h, 0, RenderTextureFormat.R16);
+                m_eyeTexture.Create();
             }
 
-            var slice = Mathf.Clamp(EyeSlice, 0, 1);
+            var slice = Mathf.Clamp(eyeSlice, 0, 1);
 
             // Copy one slice (eye) from the 2D array to our 2D texture
-            Graphics.CopyTexture(globalTex, slice, 0, _eyeTexture, 0, 0);
+            Graphics.CopyTexture(globalTex, slice, 0, m_eyeTexture, 0, 0);
 
             // Send it
-            ImagePublisher.Publish(_eyeTexture, FrameId);
+            imagePublisher.Publish(m_eyeTexture, frameId);
         }
     }
 }

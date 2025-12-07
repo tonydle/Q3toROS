@@ -1,3 +1,4 @@
+using System.Globalization;
 using UnityEngine;
 using Meta.XR;
 
@@ -21,14 +22,52 @@ namespace Unity.Robotics
         [Tooltip("Target publish rate (Hz).")]
         [Range(1f, 120f)] public float publishHz = 15f;
 
+        public string PublishHzString
+        {
+            get => publishHz.ToString();
+            set => publishHz = float.Parse(value);
+        }
+
+        private int m_resolutionOption;
+        public int ResolutionOption
+        {
+            get => m_resolutionOption;
+            set
+            {
+                cameraAccess.enabled = false;
+                switch (value)
+                {
+                    case 0:
+                        cameraAccess.RequestedResolution = new Vector2Int(320, 240);
+                        break;
+                    case 1:
+                        cameraAccess.RequestedResolution = new Vector2Int(640, 480);
+                        break;
+                    case 2:
+                        cameraAccess.RequestedResolution = new Vector2Int(800, 600);
+                        break;
+                    case 3:
+                        cameraAccess.RequestedResolution = new Vector2Int(1280, 960);
+                        break;
+                    default:
+                        Debug.LogError($"Invalid resolution option {value}");
+                        break;
+                    
+                }
+                m_resolutionOption = value;
+                cameraAccess.enabled = true;
+            }
+        }
+
         [Tooltip("If true, publish CameraInfo together with CompressedImage.")]
         public bool publishCameraInfo = true;
 
         [Tooltip("If true, send CameraInfo only once after camera starts.")]
-        public bool cameraInfoOnce = false;
+        public bool cameraInfoOnce;
 
         private float m_nextPublishTime;
         private bool m_cameraInfoSent;
+        
 
         private void Awake()
         {
@@ -66,7 +105,7 @@ namespace Unity.Robotics
             if (!imagePublisher || !cameraAccess)
                 return;
 
-            // Wait until camera is actually playing
+            // Wait until the camera is actually playing
             if (!cameraAccess.IsPlaying)
                 return;
 
@@ -76,7 +115,7 @@ namespace Unity.Robotics
 
             m_nextPublishTime += 1f / Mathf.Max(1f, publishHz);
 
-            // Get GPU texture from passthrough camera
+            // Get GPU texture from the passthrough camera
             var tex = cameraAccess.GetTexture();
             if (!tex || cameraAccess.CurrentResolution.x <= 16)
                 return; // still not ready / invalid
