@@ -3,26 +3,25 @@ using Unity.Robotics.ROSTCPConnector;
 
 namespace Unity.Robotics
 {
-    public abstract class RosPublisher<T> : MonoBehaviour where T: ROSTCPConnector.MessageGeneration.Message
+    public abstract class RosPublisher<T> : MonoBehaviour where T : ROSTCPConnector.MessageGeneration.Message
     {
-        [SerializeField] protected string _topic = "";
-        protected T _message;
+        [SerializeField] protected string m_topic = "";
         protected virtual void Start()
         {
-            ROSConnection.GetOrCreateInstance().RegisterPublisher<T>(_topic);
+            _ = ROSConnection.GetOrCreateInstance().RegisterPublisher<T>(m_topic);
         }
 
         protected void Publish(T message)
-        {                
-            if(message != null)
+        {
+            if (message != null)
             {
-                ROSConnection.GetOrCreateInstance().Publish(_topic, message);
+                ROSConnection.GetOrCreateInstance().Publish(m_topic, message);
             }
         }
 
         public void SetTopic(string topic)
         {
-            _topic = topic;
+            m_topic = topic;
         }
     }
 }

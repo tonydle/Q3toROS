@@ -8,7 +8,7 @@ namespace Unity.Robotics
     /// Publishes sensor_msgs/CompressedImage from a Texture2D.
     /// Works with passthrough snapshots, WebCamTexture, RenderTextures, etc.
     ///
-    /// Test mode: set a Texture2D in the inspector and stream it at a fixed rate.
+    /// For testing, can repeatedly publish a specified Texture2D at a set rate.
     /// </summary>
     public class RosPublisherCompressedImage : RosPublisher<RosMsgCompressedImage>
     {
@@ -21,11 +21,7 @@ namespace Unity.Robotics
         [Range(1, 100)]
         [SerializeField] private int m_jpegQuality = 80;
 
-        [Header("Processing")]
-        [Tooltip("Flip vertically after readback (useful for GL→ROS coord differences)")]
-        [SerializeField] private bool m_flipVertical = false;
-
-        // Reusable buffer to avoid GC churn when making a readable copy
+        // Reusable buffer for texture readback
         private Texture2D m_scratchReadable;
 
         // ---------- TEST / INSPECTOR STREAMING ----------
@@ -43,19 +39,16 @@ namespace Unity.Robotics
         [Range(1f, 120f)]
         [SerializeField] private float m_publishHz = 10f;
 
-        [Tooltip("If true, re-encode every frame (uses more CPU). If false, cache bytes and only update timestamps.")]
-        [SerializeField] private bool m_reencodeEveryFrame = false;
-
         private float m_nextPublishTime;
         private byte[] m_cachedBytes;
-        private int m_cachedW, m_cachedH;
-        private string m_cachedFormat;
         private bool m_cacheDirty = true;
+
+        private RosMsgCompressedImage m_message;
 
         protected override void Start()
         {
             base.Start();
-            _message = new RosMsgCompressedImage();
+            m_message = new RosMsgCompressedImage();
             m_nextPublishTime = Time.time;
             RebuildCacheIfNeeded();
         }
@@ -68,22 +61,14 @@ namespace Unity.Robotics
             {
                 m_nextPublishTime += 1f / Mathf.Max(1f, m_publishHz);
 
-                if (m_reencodeEveryFrame)
+                // Use cached bytes (fast); refresh cache only when texture/params change
+                RebuildCacheIfNeeded();
+                if (m_cachedBytes != null && m_cachedBytes.Length > 0)
                 {
-                    // Re-encode each time (simple but CPU-heavy)
-                    Publish(m_testTexture, m_testFrameId);
-                }
-                else
-                {
-                    // Use cached bytes (fast); refresh cache only when texture/params change
-                    RebuildCacheIfNeeded();
-                    if (m_cachedBytes != null && m_cachedBytes.Length > 0)
-                    {
-                        FillHeader(m_testFrameId);
-                        _message.format = m_format.ToLowerInvariant();
-                        _message.data = m_cachedBytes;
-                        Publish(_message);
-                    }
+                    FillHeader(m_testFrameId);
+                    m_message.format = m_format.ToLowerInvariant();
+                    m_message.data = m_cachedBytes;
+                    Publish(m_message);
                 }
             }
         }
@@ -106,35 +91,29 @@ namespace Unity.Robotics
             if (!m_cacheDirty || m_testTexture == null) return;
 
             var readable = EnsureReadable(m_testTexture, ref m_scratchReadable);
-            if (m_flipVertical) FlipInPlaceVertical(readable);
 
             m_cachedBytes = m_format.Equals("png", StringComparison.OrdinalIgnoreCase)
                 ? readable.EncodeToPNG()
                 : readable.EncodeToJPG(Mathf.Clamp(m_jpegQuality, 1, 100));
 
-            m_cachedW = readable.width;
-            m_cachedH = readable.height;
-            m_cachedFormat = m_format.ToLowerInvariant();
             m_cacheDirty = false;
         }
 
-        /// <summary>Publish a Texture2D directly (must be readable or we'll copy it).</summary>
+        /// <summary>Publish a Texture2D directly</summary>
         public void Publish(Texture2D tex, string frameIdOverride = null)
         {
             if (!tex) return;
 
             var readable = EnsureReadable(tex, ref m_scratchReadable);
-            if (m_flipVertical) FlipInPlaceVertical(readable);
-
             var bytes = m_format.Equals("png", StringComparison.OrdinalIgnoreCase)
                 ? readable.EncodeToPNG()
                 : readable.EncodeToJPG(Mathf.Clamp(m_jpegQuality, 1, 100));
 
             FillHeader(frameIdOverride);
-            _message.format = m_format.ToLowerInvariant();
-            _message.data = bytes;
+            m_message.format = m_format.ToLowerInvariant();
+            m_message.data = bytes;
 
-            Publish(_message);
+            Publish(m_message);
         }
 
         /// <summary>Publish any Texture. Will be copied to a readable Texture2D.</summary>
@@ -143,17 +122,16 @@ namespace Unity.Robotics
             if (tex == null) return;
 
             var readable = BlitToReadable(tex, ref m_scratchReadable);
-            if (m_flipVertical) FlipInPlaceVertical(readable);
 
             var bytes = m_format.Equals("png", StringComparison.OrdinalIgnoreCase)
                 ? readable.EncodeToPNG()
                 : readable.EncodeToJPG(Mathf.Clamp(m_jpegQuality, 1, 100));
 
             FillHeader(frameIdOverride);
-            _message.format = m_format.ToLowerInvariant();
-            _message.data = bytes;
+            m_message.format = m_format.ToLowerInvariant();
+            m_message.data = bytes;
 
-            Publish(_message);
+            Publish(m_message);
         }
 
         /// <summary>Publish from an active WebCamTexture.</summary>
@@ -168,27 +146,25 @@ namespace Unity.Robotics
             m_scratchReadable.SetPixels32(webcamTex.GetPixels32());
             m_scratchReadable.Apply(false, false);
 
-            if (m_flipVertical) FlipInPlaceVertical(m_scratchReadable);
-
             var bytes = m_format.Equals("png", StringComparison.OrdinalIgnoreCase)
                 ? m_scratchReadable.EncodeToPNG()
                 : m_scratchReadable.EncodeToJPG(Mathf.Clamp(m_jpegQuality, 1, 100));
 
             FillHeader(frameIdOverride);
-            _message.format = m_format.ToLowerInvariant();
-            _message.data = bytes;
+            m_message.format = m_format.ToLowerInvariant();
+            m_message.data = bytes;
 
-            Publish(_message);
+            Publish(m_message);
         }
 
         private void FillHeader(string frameIdOverride)
         {
-            _message.header.frame_id = string.IsNullOrEmpty(frameIdOverride) ? m_frameID : frameIdOverride;
+            m_message.header.frame_id = string.IsNullOrEmpty(frameIdOverride) ? m_frameID : frameIdOverride;
 
             var now = DateTime.UtcNow;
             var epochMs = (long)(now - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-            _message.header.stamp.sec = (int)(epochMs / 1000);
-            _message.header.stamp.nanosec = (uint)((epochMs % 1000) * 1_000_000);
+            m_message.header.stamp.sec = (int)(epochMs / 1000);
+            m_message.header.stamp.nanosec = (uint)(epochMs % 1000 * 1_000_000);
         }
 
         /// <summary>Ensure the given Texture2D is readable; if not, makes a readable copy into scratch.</summary>
@@ -202,11 +178,6 @@ namespace Unity.Robotics
         {
             int w = src.width, h = src.height;
 
-            // Detect if source is single-channel (like R16 depth RT)
-            var isSingleChannel = false;
-            if (src is RenderTexture srcRT && srcRT.format == RenderTextureFormat.R16)
-                isSingleChannel = true;
-
             if (!scratch || scratch.width != w || scratch.height != h || scratch.format != TextureFormat.RGBA32)
                 scratch = new Texture2D(w, h, TextureFormat.RGBA32, false);
 
@@ -219,21 +190,6 @@ namespace Unity.Robotics
                 RenderTexture.active = rt;
                 scratch.ReadPixels(new Rect(0, 0, w, h), 0, 0, false);
                 scratch.Apply(false, false);
-
-                // Grayscale fix for single-channel sources
-                if (isSingleChannel)
-                {
-                    var pixels = scratch.GetPixels32();
-                    for (int i = 0; i < pixels.Length; i++)
-                    {
-                        var c = pixels[i];
-                        var v = c.r;
-                        pixels[i] = new Color32(v, v, v, 255);
-                    }
-
-                    scratch.SetPixels32(pixels);
-                    scratch.Apply(false, false);
-                }
             }
             finally
             {
@@ -243,32 +199,10 @@ namespace Unity.Robotics
             return scratch;
         }
 
-        /// <summary>Vertical flip of Texture2D pixels (RGBA32 path).</summary>
-        private static void FlipInPlaceVertical(Texture2D tex)
-        {
-            var w = tex.width;
-            var h = tex.height;
-            var pixels = tex.GetPixels32();
-
-            for (int yTop = 0, yBot = h - 1; yTop < yBot; yTop++, yBot--)
-            {
-                var rowTop = yTop * w;
-                var rowBot = yBot * w;
-                for (var x = 0; x < w; x++)
-                {
-                    (pixels[rowTop + x], pixels[rowBot + x]) = (pixels[rowBot + x], pixels[rowTop + x]);
-                }
-            }
-
-            tex.SetPixels32(pixels);
-            tex.Apply(false, false);
-        }
-
-        // -------- Optional setters (mark cache dirty where relevant) --------
+        // -------- Setters (also mark cache dirty) --------
         public void SetFrameId(string frameId) { m_frameID = frameId; MarkCacheDirty(); }
         public void SetFormat(string fmt) { m_format = string.IsNullOrEmpty(fmt) ? "jpeg" : fmt.ToLowerInvariant(); MarkCacheDirty(); }
         public void SetJpegQuality(int q) { m_jpegQuality = Mathf.Clamp(q, 1, 100); MarkCacheDirty(); }
-        public void SetFlipVertical(bool flip) { m_flipVertical = flip; MarkCacheDirty(); }
 
         // Test controls
         public void SetTestTexture(Texture2D tex) { m_testTexture = tex; MarkCacheDirty(); }

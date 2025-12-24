@@ -1,4 +1,3 @@
-using System.Globalization;
 using UnityEngine;
 using Meta.XR;
 
@@ -11,21 +10,21 @@ namespace Unity.Robotics
     public class RosPassthroughStreamer : MonoBehaviour
     {
         [Header("Sources")]
-        public PassthroughCameraAccess cameraAccess;
-        public RosPublisherCompressedImage imagePublisher;
-        public RosPublisherCameraInfo cameraInfoPublisher; 
+        public PassthroughCameraAccess CameraAccess;
+        public RosPublisherCompressedImage ImagePublisher;
+        public RosPublisherCameraInfo CameraInfoPublisher;
 
         [Header("ROS Header")]
-        public string frameId = "quest3_passthrough";
+        public string FrameId = "quest3_passthrough";
 
         [Header("Streaming")]
         [Tooltip("Target publish rate (Hz).")]
-        [Range(1f, 120f)] public float publishHz = 15f;
+        [Range(1f, 120f)] public float PublishHz = 15f;
 
         public string PublishHzString
         {
-            get => publishHz.ToString();
-            set => publishHz = float.Parse(value);
+            get => PublishHz.ToString();
+            set => PublishHz = float.Parse(value);
         }
 
         private int m_resolutionOption;
@@ -34,48 +33,48 @@ namespace Unity.Robotics
             get => m_resolutionOption;
             set
             {
-                cameraAccess.enabled = false;
+                CameraAccess.enabled = false;
                 switch (value)
                 {
                     case 0:
-                        cameraAccess.RequestedResolution = new Vector2Int(320, 240);
+                        CameraAccess.RequestedResolution = new Vector2Int(320, 240);
                         break;
                     case 1:
-                        cameraAccess.RequestedResolution = new Vector2Int(640, 480);
+                        CameraAccess.RequestedResolution = new Vector2Int(640, 480);
                         break;
                     case 2:
-                        cameraAccess.RequestedResolution = new Vector2Int(800, 600);
+                        CameraAccess.RequestedResolution = new Vector2Int(800, 600);
                         break;
                     case 3:
-                        cameraAccess.RequestedResolution = new Vector2Int(1280, 960);
+                        CameraAccess.RequestedResolution = new Vector2Int(1280, 960);
                         break;
                     default:
                         Debug.LogError($"Invalid resolution option {value}");
                         break;
-                    
+
                 }
                 m_resolutionOption = value;
-                cameraAccess.enabled = true;
+                CameraAccess.enabled = true;
             }
         }
 
         [Tooltip("If true, publish CameraInfo together with CompressedImage.")]
-        public bool publishCameraInfo = true;
+        public bool PublishCameraInfo = true;
 
         [Tooltip("If true, send CameraInfo only once after camera starts.")]
-        public bool cameraInfoOnce;
+        public bool CameraInfoOnce;
 
         private float m_nextPublishTime;
         private bool m_cameraInfoSent;
-        
+
 
         private void Awake()
         {
-            if (!imagePublisher)
+            if (!ImagePublisher)
                 Debug.LogError("[RosPassthroughStreamer] ImagePublisher not set.");
-            if (!cameraAccess)
+            if (!CameraAccess)
                 Debug.LogError("[RosPassthroughStreamer] CameraAccess not set.");
-            if (publishCameraInfo && !cameraInfoPublisher)
+            if (PublishCameraInfo && !CameraInfoPublisher)
                 Debug.LogWarning("[RosPassthroughStreamer] CameraInfoPublisher not set.");
 
             if (!PassthroughCameraAccess.IsSupported)
@@ -90,8 +89,8 @@ namespace Unity.Robotics
         private void OnEnable()
         {
             // Make sure the camera component is active so it can request permission
-            if (cameraAccess && !cameraAccess.enabled)
-                cameraAccess.enabled = true;
+            if (CameraAccess && !CameraAccess.enabled)
+                CameraAccess.enabled = true;
         }
 
         private void Start()
@@ -102,31 +101,31 @@ namespace Unity.Robotics
 
         private void Update()
         {
-            if (!imagePublisher || !cameraAccess)
+            if (!ImagePublisher || !CameraAccess)
                 return;
 
             // Wait until the camera is actually playing
-            if (!cameraAccess.IsPlaying)
+            if (!CameraAccess.IsPlaying)
                 return;
 
             // Rate limiting
             if (Time.time < m_nextPublishTime)
                 return;
 
-            m_nextPublishTime += 1f / Mathf.Max(1f, publishHz);
+            m_nextPublishTime += 1f / Mathf.Max(1f, PublishHz);
 
             // Get GPU texture from the passthrough camera
-            var tex = cameraAccess.GetTexture();
-            if (!tex || cameraAccess.CurrentResolution.x <= 16)
+            var tex = CameraAccess.GetTexture();
+            if (!tex || CameraAccess.CurrentResolution.x <= 16)
                 return; // still not ready / invalid
 
             // Publish image
-            imagePublisher.Publish(tex, frameId);
+            ImagePublisher.Publish(tex, FrameId);
 
             // Publish CameraInfo (derived from PassthroughCameraAccess intrinsics)
-            if (publishCameraInfo && cameraInfoPublisher)
+            if (PublishCameraInfo && CameraInfoPublisher)
             {
-                if (!cameraInfoOnce || !m_cameraInfoSent)
+                if (!CameraInfoOnce || !m_cameraInfoSent)
                 {
                     PublishCameraInfoFromIntrinsics();
                     m_cameraInfoSent = true;
@@ -138,8 +137,8 @@ namespace Unity.Robotics
         private void PublishCameraInfoFromIntrinsics()
         {
             // Resolution: prefer CurrentResolution; fallback to intrinsics sensor resolution
-            var res = cameraAccess.CurrentResolution;
-            var intr = cameraAccess.Intrinsics;
+            var res = CameraAccess.CurrentResolution;
+            var intr = CameraAccess.Intrinsics;
 
             if (res.x <= 0 || res.y <= 0)
                 res = intr.SensorResolution;
@@ -152,7 +151,7 @@ namespace Unity.Robotics
 
             // Intrinsics: fx/fy, cx/cy from Meta's intrinsics
             var focal = intr.FocalLength;      // Vector2 (fx, fy)
-            var pp    = intr.PrincipalPoint;   // Vector2 (cx, cy)
+            var pp = intr.PrincipalPoint;   // Vector2 (cx, cy)
 
             double fx = focal.x;
             double fy = focal.y;
@@ -160,15 +159,15 @@ namespace Unity.Robotics
             double cy = pp.y;
 
             // Distortion unknown
-            cameraInfoPublisher.Publish(
+            CameraInfoPublisher.Publish(
                 res.x,
                 res.y,
                 fx,
                 fy,
                 cx,
                 cy,
-                frameId,
-                null  // or new double[5]{k1,k2,t1,t2,k3} if we have real values
+                FrameId,
+                null  // or new double[5]{k1,k2,t1,t2,k3} if known
             );
         }
     }

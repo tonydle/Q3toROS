@@ -1542,7 +1542,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1217855185164972715, guid: 489d4be4aa493224a81def86c2f706b4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1068646332}
   m_SourcePrefab: {fileID: 100100000, guid: 489d4be4aa493224a81def86c2f706b4, type: 3}
 --- !u!224 &341250628 stripped
 RectTransform:
@@ -1560,6 +1563,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d02efd1dd7ee874294db5cedd098de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &341250630 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2579850041761302001, guid: 489d4be4aa493224a81def86c2f706b4, type: 3}
+  m_PrefabInstance: {fileID: 341250627}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &341250631 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1217855185164972715, guid: 489d4be4aa493224a81def86c2f706b4, type: 3}
+  m_PrefabInstance: {fileID: 341250627}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &353932018
 GameObject:
   m_ObjectHideFlags: 0
@@ -1789,16 +1802,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb4448d5a4a10d428cfe5d1fb454e42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _topic: /quest3/right_eye/color/compressed
+  m_topic: /quest3/right_eye/color/compressed
   m_frameID: quest3_right_eye
   m_format: jpeg
-  m_jpegQuality: 70
-  m_flipVertical: 0
+  m_jpegQuality: 80
   m_publishTestTexture: 0
   m_testTexture: {fileID: 2800000, guid: fff70cc323e7244f0a6fed5ecb11a9a1, type: 3}
   m_testFrameId: camera
   m_publishHz: 10
-  m_reencodeEveryFrame: 0
 --- !u!114 &382521212
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1811,13 +1822,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7f66d7e044bec047bb62b022cad4432, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraAccess: {fileID: 382521213}
-  imagePublisher: {fileID: 382521211}
-  cameraInfoPublisher: {fileID: 382521216}
-  frameId: quest3_right_eye
-  publishHz: 30
-  publishCameraInfo: 1
-  cameraInfoOnce: 0
+  CameraAccess: {fileID: 382521213}
+  ImagePublisher: {fileID: 382521211}
+  CameraInfoPublisher: {fileID: 382521216}
+  FrameId: quest3_right_eye
+  PublishHz: 15
+  PublishCameraInfo: 1
+  CameraInfoOnce: 0
 --- !u!114 &382521213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1861,9 +1872,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 603af1c12f4c4f7582a71b4f483be6f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unity.Robotics.RosPublisherCameraInfo
-  _topic: /quest3/right_eye/color/camera_info
-  mFrameID: quest3_right_eye
-  mDistortionModel: plumb_bob
+  m_topic: /quest3/right_eye/color/camera_info
+  m_frameID: quest3_right_eye
+  m_distortionModel: plumb_bob
 --- !u!1 &398065787
 GameObject:
   m_ObjectHideFlags: 0
@@ -2978,7 +2989,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1217855185164972715, guid: 489d4be4aa493224a81def86c2f706b4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 623932234}
   m_SourcePrefab: {fileID: 100100000, guid: 489d4be4aa493224a81def86c2f706b4, type: 3}
 --- !u!224 &623932229 stripped
 RectTransform:
@@ -2990,7 +3004,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8750719121711460026, guid: 489d4be4aa493224a81def86c2f706b4, type: 3}
   m_PrefabInstance: {fileID: 623932228}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 623932233}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2fafe2cfe61f6974895a912c3755e8f1, type: 3}
@@ -3007,6 +3021,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d02efd1dd7ee874294db5cedd098de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &623932232 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2579850041761302001, guid: 489d4be4aa493224a81def86c2f706b4, type: 3}
+  m_PrefabInstance: {fileID: 623932228}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &623932233 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1217855185164972715, guid: 489d4be4aa493224a81def86c2f706b4, type: 3}
+  m_PrefabInstance: {fileID: 623932228}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &623932234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623932233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee10491ef6d5d1d49a270cf6b09bdc19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.VR::OVROverlayCanvas
+  _enableMipmapping: 0
+  _dynamicResolution: 1
+  _redrawResolutionThreshold: 2147483647
+  rectTransform: {fileID: 623932232}
+  maxTextureSize: 2048
+  manualRedraw: 0
+  renderInterval: 1
+  renderIntervalFrameOffset: 0
+  expensive: 0
+  layer: 5
+  opacity: 2
+  shape: 0
+  curveRadius: 1
+  overlapMask: 0
+  overlayType: 1
+  _overlayEnabled: 1
 --- !u!1 &693624677
 GameObject:
   m_ObjectHideFlags: 0
@@ -5462,12 +5514,40 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8750719121711460026, guid: 489d4be4aa493224a81def86c2f706b4, type: 3}
   m_PrefabInstance: {fileID: 341250627}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 341250631}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2fafe2cfe61f6974895a912c3755e8f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1068646332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341250631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee10491ef6d5d1d49a270cf6b09bdc19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.VR::OVROverlayCanvas
+  _enableMipmapping: 0
+  _dynamicResolution: 1
+  _redrawResolutionThreshold: 2147483647
+  rectTransform: {fileID: 341250630}
+  maxTextureSize: 2048
+  manualRedraw: 0
+  renderInterval: 1
+  renderIntervalFrameOffset: 0
+  expensive: 0
+  layer: 5
+  opacity: 2
+  shape: 0
+  curveRadius: 1
+  overlapMask: 0
+  overlayType: 1
+  _overlayEnabled: 1
 --- !u!1 &1110034865
 GameObject:
   m_ObjectHideFlags: 0
@@ -6018,16 +6098,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb4448d5a4a10d428cfe5d1fb454e42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _topic: /quest3/left_eye/color/compressed
+  m_topic: /quest3/left_eye/color/compressed
   m_frameID: quest3_left_eye
   m_format: jpeg
-  m_jpegQuality: 70
-  m_flipVertical: 0
+  m_jpegQuality: 80
   m_publishTestTexture: 0
   m_testTexture: {fileID: 2800000, guid: fff70cc323e7244f0a6fed5ecb11a9a1, type: 3}
   m_testFrameId: camera
   m_publishHz: 10
-  m_reencodeEveryFrame: 0
 --- !u!4 &1155724899
 Transform:
   m_ObjectHideFlags: 0
@@ -6055,13 +6133,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7f66d7e044bec047bb62b022cad4432, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraAccess: {fileID: 1155724902}
-  imagePublisher: {fileID: 1155724898}
-  cameraInfoPublisher: {fileID: 1155724903}
-  frameId: quest3_left_eye
-  publishHz: 30
-  publishCameraInfo: 1
-  cameraInfoOnce: 0
+  CameraAccess: {fileID: 1155724902}
+  ImagePublisher: {fileID: 1155724898}
+  CameraInfoPublisher: {fileID: 1155724903}
+  FrameId: quest3_left_eye
+  PublishHz: 15
+  PublishCameraInfo: 1
+  CameraInfoOnce: 0
 --- !u!114 &1155724902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6090,9 +6168,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 603af1c12f4c4f7582a71b4f483be6f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unity.Robotics.RosPublisherCameraInfo
-  _topic: /quest3/left_eye/color/camera_info
-  mFrameID: quest3_left_eye
-  mDistortionModel: plumb_bob
+  m_topic: /quest3/left_eye/color/camera_info
+  m_frameID: quest3_left_eye
+  m_distortionModel: plumb_bob
 --- !u!1 &1173494924
 GameObject:
   m_ObjectHideFlags: 0
@@ -8112,16 +8190,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb4448d5a4a10d428cfe5d1fb454e42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _topic: /quest3/right_eye/depth/compressed
+  m_topic: /quest3/right_eye/depth/compressed
   m_frameID: quest3_right_eye
   m_format: jpeg
-  m_jpegQuality: 70
-  m_flipVertical: 0
+  m_jpegQuality: 80
   m_publishTestTexture: 0
   m_testTexture: {fileID: 2800000, guid: fff70cc323e7244f0a6fed5ecb11a9a1, type: 3}
   m_testFrameId: camera
   m_publishHz: 10
-  m_reencodeEveryFrame: 0
 --- !u!114 &1589689751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8134,12 +8210,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5935d5d7436fabc4d9179367745def01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unity.Robotics.RosEnvironmentDepthCompressedStreamer
-  depthManager: {fileID: 276451035}
-  imagePublisher: {fileID: 1589689750}
-  frameId: quest3_right_eye
-  eyeSlice: 1
-  depthTextureProperty: _EnvironmentDepthTexture
-  publishHz: 15
+  DepthManager: {fileID: 276451035}
+  ImagePublisher: {fileID: 1589689750}
+  FrameId: quest3_right_eye
+  EyeSlice: 1
+  DepthTextureProperty: _EnvironmentDepthTexture
+  PublishHz: 15
 --- !u!4 &1589689752
 Transform:
   m_ObjectHideFlags: 0
@@ -8346,12 +8422,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5935d5d7436fabc4d9179367745def01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unity.Robotics.RosEnvironmentDepthCompressedStreamer
-  depthManager: {fileID: 276451035}
-  imagePublisher: {fileID: 1661517015}
-  frameId: quest3_left_eye
-  eyeSlice: 0
-  depthTextureProperty: _EnvironmentDepthTexture
-  publishHz: 15
+  DepthManager: {fileID: 276451035}
+  ImagePublisher: {fileID: 1661517015}
+  FrameId: quest3_left_eye
+  EyeSlice: 0
+  DepthTextureProperty: _EnvironmentDepthTexture
+  PublishHz: 15
 --- !u!4 &1661517014
 Transform:
   m_ObjectHideFlags: 0
@@ -8379,16 +8455,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb4448d5a4a10d428cfe5d1fb454e42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _topic: /quest3/left_eye/depth/compressed
+  m_topic: /quest3/left_eye/depth/compressed
   m_frameID: quest3_left_eye
   m_format: jpeg
-  m_jpegQuality: 70
-  m_flipVertical: 0
+  m_jpegQuality: 80
   m_publishTestTexture: 0
   m_testTexture: {fileID: 2800000, guid: fff70cc323e7244f0a6fed5ecb11a9a1, type: 3}
   m_testFrameId: camera
   m_publishHz: 10
-  m_reencodeEveryFrame: 0
 --- !u!1 &1713466816
 GameObject:
   m_ObjectHideFlags: 0
@@ -12169,6 +12243,7 @@ GameObject:
   - component: {fileID: 5934610390219960156}
   - component: {fileID: 4332511725097414521}
   - component: {fileID: 2998814279392767178}
+  - component: {fileID: 9002330856702478753}
   m_Layer: 0
   m_Name: CanvasPanel
   m_TagString: Untagged
@@ -15035,10 +15110,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1016ec5f4124c5a91bca73e9feee7de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ISDKSettingsMenuManager
-  menuParent: {fileID: 7835063497401646889}
-  showMenuAudio: {fileID: 7585293242242872776}
-  hideMenuAudio: {fileID: 7585293242242872776}
-  spawnPoint: {fileID: 4621189329879624882}
+  m_menuParent: {fileID: 7835063497401646889}
+  m_showMenuAudio: {fileID: 7585293242242872776}
+  m_hideMenuAudio: {fileID: 7585293242242872776}
+  m_spawnPoint: {fileID: 4621189329879624882}
 --- !u!114 &5433486309892499392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15051,19 +15126,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5b3e91c1e114ba4bd3c53b878e0b273, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SettingsPersistenceManager
-  keyPrefix: Q3toROS.
-  rosIpInput: {fileID: 987759532}
-  toggles:
+  m_keyPrefix: Q3toROS.
+  m_toggles:
   - {fileID: 739790954}
   - {fileID: 896658867}
   - {fileID: 1735622932}
   - {fileID: 928293868}
-  textInputs:
+  m_textInputs:
   - {fileID: 1154874915}
   - {fileID: 1265021918}
   - {fileID: 1027215460}
   - {fileID: 910005716}
-  dropdowns:
+  - {fileID: 987759532}
+  m_dropdowns:
   - {fileID: 341250629}
   - {fileID: 623932231}
 --- !u!1 &5462045114829645779
@@ -17810,6 +17885,34 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1024, y: 828}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &9002330856702478753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469441440433264038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee10491ef6d5d1d49a270cf6b09bdc19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Oculus.VR::OVROverlayCanvas
+  _enableMipmapping: 0
+  _dynamicResolution: 1
+  _redrawResolutionThreshold: 2147483647
+  rectTransform: {fileID: 9002330856702478752}
+  maxTextureSize: 2048
+  manualRedraw: 0
+  renderInterval: 1
+  renderIntervalFrameOffset: 0
+  expensive: 0
+  layer: 5
+  opacity: 2
+  shape: 0
+  curveRadius: 1
+  overlapMask: 0
+  overlayType: 1
+  _overlayEnabled: 1
 --- !u!1818360608 &9022724952973407466
 PositionConstraint:
   m_ObjectHideFlags: 0

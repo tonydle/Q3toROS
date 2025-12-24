@@ -12,8 +12,8 @@ namespace Unity.Robotics
     public class RosPublisherCameraInfo : RosPublisher<RosMsgCameraInfo>
     {
         [Header("Defaults")]
-        [SerializeField] private string mFrameID = "camera";
-        [SerializeField] private string mDistortionModel = "plumb_bob";
+        [SerializeField] private string m_frameID = "camera";
+        [SerializeField] private string m_distortionModel = "plumb_bob";
 
         private RosMsgCameraInfo m_message;
 
@@ -43,10 +43,10 @@ namespace Unity.Robotics
 
             FillHeader(frameIdOverride);
 
-            m_message.width  = (uint)width;
+            m_message.width = (uint)width;
             m_message.height = (uint)height;
 
-            m_message.distortion_model = mDistortionModel;
+            m_message.distortion_model = m_distortionModel;
 
             // Distortion: if none provided, publish zeros for 5 coeffs (common convention).
             m_message.D = distortion ?? new double[] { 0, 0, 0, 0, 0 };
@@ -56,8 +56,8 @@ namespace Unity.Robotics
             // [ 0  fy  cy ]
             // [ 0   0   1 ]
             m_message.K = new double[9];
-            m_message.K[0] = fx;  m_message.K[1] = 0.0; m_message.K[2] = cx;
-            m_message.K[3] = 0.0; m_message.K[4] = fy;  m_message.K[5] = cy;
+            m_message.K[0] = fx; m_message.K[1] = 0.0; m_message.K[2] = cx;
+            m_message.K[3] = 0.0; m_message.K[4] = fy; m_message.K[5] = cy;
             m_message.K[6] = 0.0; m_message.K[7] = 0.0; m_message.K[8] = 1.0;
 
             // Rectification matrix R (identity)
@@ -73,9 +73,9 @@ namespace Unity.Robotics
             // [ 0  fy  cy  0 ]
             // [ 0   0   1  0 ]
             m_message.P = new double[12];
-            m_message.P[0]  = fx;  m_message.P[1]  = 0.0; m_message.P[2]  = cx; m_message.P[3]  = 0.0;
-            m_message.P[4]  = 0.0; m_message.P[5]  = fy;  m_message.P[6]  = cy; m_message.P[7]  = 0.0;
-            m_message.P[8]  = 0.0; m_message.P[9]  = 0.0; m_message.P[10] = 1.0; m_message.P[11] = 0.0;
+            m_message.P[0] = fx; m_message.P[1] = 0.0; m_message.P[2] = cx; m_message.P[3] = 0.0;
+            m_message.P[4] = 0.0; m_message.P[5] = fy; m_message.P[6] = cy; m_message.P[7] = 0.0;
+            m_message.P[8] = 0.0; m_message.P[9] = 0.0; m_message.P[10] = 1.0; m_message.P[11] = 0.0;
 
             // No binning
             m_message.binning_x = 1;
@@ -84,10 +84,10 @@ namespace Unity.Robotics
             // ROI unset / full frame
             m_message.roi = new RosMsgRegionOfInterest
             {
-                x_offset  = 0,
-                y_offset  = 0,
-                height    = 0,
-                width     = 0,
+                x_offset = 0,
+                y_offset = 0,
+                height = 0,
+                width = 0,
                 do_rectify = false
             };
 
@@ -97,16 +97,16 @@ namespace Unity.Robotics
         private void FillHeader(string frameIdOverride)
         {
             m_message.header.frame_id =
-                string.IsNullOrEmpty(frameIdOverride) ? mFrameID : frameIdOverride;
+                string.IsNullOrEmpty(frameIdOverride) ? m_frameID : frameIdOverride;
 
             var now = DateTime.UtcNow;
             var epochMs = (long)(now - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-            m_message.header.stamp.sec     = (int)(epochMs / 1000);
-            m_message.header.stamp.nanosec = (uint)((epochMs % 1000) * 1_000_000);
+            m_message.header.stamp.sec = (int)(epochMs / 1000);
+            m_message.header.stamp.nanosec = (uint)(epochMs % 1000 * 1_000_000);
         }
 
         // Optional helpers
-        public void SetframeId(string frameId) => mFrameID = frameId;
-        public void SetDistortionModel(string model) => mDistortionModel = model;
+        public void SetframeId(string frameId) => m_frameID = frameId;
+        public void SetDistortionModel(string model) => m_distortionModel = model;
     }
 }
