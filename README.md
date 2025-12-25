@@ -13,7 +13,7 @@ Configurable settings menu during runtime
 ![Settings Menu](docs/images/SettingsMenu.gif)
 
 ## Installation
-Available as a built apk. See [Releases](https://github.com/ynot/Q3toROS/releases) for latest version. 
+Available as a built apk. See [Releases](https://github.com/tonydle/Q3toROS/releases) for latest version. 
 
 You can use [Meta Quest Developer Hub](https://developers.meta.com/horizon/documentation/unity/ts-mqdh/) or [SideQuest](https://sidequestvr.com/) to install the apk onto your Quest 3. Then launch it under "Unknown Sources" in your App Library.
 
@@ -46,6 +46,6 @@ The following ROS2 topics are published by the app (if enabled in the settings m
 
 
 ## License
-The [Oculus License](unity/Q3toROS/LICENSE.txt) applies to the Meta SDK and related components.
+The [Oculus License](unity/Q3toROS/OCULUS_LICENSE.txt) applies to the Meta SDK and related components.
 
 Other scripts and assets in this project are licensed under the [MIT License](LICENSE).
